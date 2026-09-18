@@ -7,7 +7,7 @@ pygame.key.stop_text_input()
 
 screen = pygame.display.set_mode((400,600))
 
-pygame.display.set_caption("Fleepy Bird")
+pygame.display.set_caption("Flappy Bird")
 
 clock = pygame.time.Clock()
 font = pygame.font.Font(None, 50)
