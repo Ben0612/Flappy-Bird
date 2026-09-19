@@ -74,6 +74,22 @@ pipe_bottom_rect2 = pygame.Rect(
 
 pipe_speed = 3
 
+# 水管上下移動設定
+pipe_vertical_speed1 = 1
+pipe_direction1 = 1
+
+# 隨機決定第一根水管是否上下移動
+pipe_moving1 = random.choice([True, False])
+
+pipe_vertical_speed2 = 1
+pipe_direction2 = 1
+
+pipe_moving2 = random.choice([True, False])
+
+# 水管上下移動範圍
+pipe_min_top1 = 100
+pipe_max_bottom1 = 500
+
 running = True
 game_over = False
 score = 0
@@ -91,9 +107,15 @@ while running:
 
     bird_rect.topleft = (bird_x, bird_y)
 
-    # 防止小鳥掉出畫面
+    # 防止小鳥掉出畫面(地板)
     if bird_y >= 570:
         bird_y = 570
+        bird_velocity = 0
+        game_over = True
+
+    # 防止小鳥飛出畫面(天花板)
+    if bird_y <= 0:
+        bird_y = 0
         bird_velocity = 0
         game_over = True
 
@@ -114,6 +136,12 @@ while running:
 
                     pipe_scored1 = False
                     pipe_scored2 = False
+
+                    pipe_moving1 = random.choice([True, False])
+                    pipe_moving2 = random.choice([True, False])
+
+                    pipe_direction1 = 1
+                    pipe_direction2 = 1
 
                     game_started = True
 
@@ -144,11 +172,49 @@ while running:
         pipe_x -= pipe_speed
         pipe_x2 -= pipe_speed
 
+    # 第一根水管上下移動
+    if game_started and not game_over and pipe_moving1:
+        pipe_top_height1 += pipe_vertical_speed1 * pipe_direction1
+        pipe_bottom_y1 += pipe_vertical_speed1 * pipe_direction1
+
+    if game_started and not game_over and pipe_moving2:
+        pipe_top_height2 += pipe_vertical_speed2 * pipe_direction2
+        pipe_bottom_y2 += pipe_vertical_speed2 * pipe_direction2
+
+    # 水管碰到上下邊界後反向
+    if pipe_top_height1 <= pipe_min_top1:
+        pipe_top_height1 = pipe_min_top1
+        pipe_bottom_y1 = pipe_top_height1 + gap
+        pipe_direction1 = 1
+
+    if pipe_bottom_y1 >= pipe_max_bottom1:
+        pipe_bottom_y1 = pipe_max_bottom1
+        pipe_top_height1 = pipe_bottom_y1 - gap
+        pipe_direction1 = -1
+
+    if pipe_top_height2 <= pipe_min_top1:
+        pipe_top_height2 = pipe_min_top1
+        pipe_bottom_y2 = pipe_top_height2 + gap
+        pipe_direction2 = 1
+
+    if pipe_bottom_y2 >= pipe_max_bottom1:
+        pipe_bottom_y2 = pipe_max_bottom1
+        pipe_top_height2 = pipe_bottom_y2 - gap
+        pipe_direction2 = -1
+
     pipe_top_rect1.x = pipe_x
     pipe_bottom_rect1.x = pipe_x
 
+    pipe_top_rect1.height = pipe_top_height1
+    pipe_bottom_rect1.y = pipe_bottom_y1
+    pipe_bottom_rect1.height = 600 - pipe_bottom_y1
+
     pipe_top_rect2.x = pipe_x2
     pipe_bottom_rect2.x = pipe_x2
+
+    pipe_top_rect2.height = pipe_top_height2
+    pipe_bottom_rect2.y = pipe_bottom_y2
+    pipe_bottom_rect2.height = 600 - pipe_bottom_y2
 
     if bird_rect.colliderect(pipe_top_rect1) or bird_rect.colliderect(pipe_bottom_rect1):
         game_over = True
@@ -176,6 +242,9 @@ while running:
 
         pipe_scored1 = False
 
+        pipe_moving1 = random.choice([True, False])
+        pipe_direction1 = 1
+
     if pipe_x2 < -pipe_width:
         pipe_x2 = pipe_x + pipe_distance
         pipe_top_height2 = random.randint(100, 300)
@@ -186,6 +255,9 @@ while running:
         pipe_bottom_rect2.height = 600 - pipe_bottom_y2
 
         pipe_scored2 = False
+
+        pipe_moving2 = random.choice([True, False])
+        pipe_direction2 = 1
     
     # 畫天空
     screen.fill((135, 206, 235))

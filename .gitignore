@@ -1,0 +1,30 @@
+# Python cache
+
+**pycache**/
+*.py[cod]
+
+# Virtual environment
+
+venv/
+env/
+.venv/
+
+# VS Code
+
+.vscode/
+
+# Python environment files
+
+*.env
+
+# OS files
+
+.DS_Store
+Thumbs.db
+
+# AI model files
+
+*.pth
+*.pt
+*.pkl
+*.pickle
