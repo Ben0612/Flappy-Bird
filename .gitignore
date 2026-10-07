@@ -28,3 +28,6 @@ Thumbs.db
 *.pt
 *.pkl
 *.pickle
+
+__pycache__/
+*.pyc
