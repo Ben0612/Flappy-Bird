@@ -50,7 +50,7 @@ class FlappyBirdEnv:
         print("水管缺口高度：", self.pipe_gap_y)
 
     def get_state(self):
-        # 把小鳥的高度分成 5 個區間
+        # 把小鳥的高度分成 6 個區間
         if self.bird_y < 120:
             bird_height_state = 0
 
@@ -86,16 +86,29 @@ class FlappyBirdEnv:
         if pipe_distance < 0:
             pipe_distance_state = 0
 
-        elif pipe_distance < 100:
+        elif pipe_distance < 40:
             pipe_distance_state = 1
 
-        elif pipe_distance < 200:
+        elif pipe_distance < 100:
             pipe_distance_state = 2
 
-        else:
+        elif pipe_distance < 200:
             pipe_distance_state = 3
 
-        return (bird_height_state, bird_velocity_state, pipe_distance_state)
+        else:
+            pipe_distance_state = 4
+
+        # 把水管缺口高度分成 3 個區間
+        if self.pipe_gap_y < 267:
+            pipe_gap_state = 0
+
+        elif self.pipe_gap_y < 334:
+            pipe_gap_state = 1
+
+        else:
+            pipe_gap_state = 2
+
+        return (bird_height_state, bird_velocity_state, pipe_distance_state, pipe_gap_state)
 
     def step(self, action):
 
@@ -162,6 +175,7 @@ class FlappyBirdEnv:
 
         # 預設：鳥還活著
         done = False
+        death_reason = None
 
         # 預設：活著就得到 +1
         reward = 1
@@ -187,30 +201,34 @@ class FlappyBirdEnv:
             self.pipe_x,
             self.pipe_gap_y + self.pipe_gap / 2,
             self.pipe_width,
-            self.height
+            self.height - (self.pipe_gap_y + self.pipe_gap / 2)
         )
 
         # 判斷小鳥是否撞到上水管
         if bird_rect.colliderect(top_pipe_rect):
             done = True
             reward = -100
+            death_reason = "撞到上水管"
 
         # 判斷小鳥是否撞到下水管
         if bird_rect.colliderect(bottom_pipe_rect):
             done = True
             reward = -100
+            death_reason = "撞到下水管"
 
         # 如果鳥飛出畫面上方
         if self.bird_y < 0:
             done = True
             reward = -100
+            death_reason = "飛出畫面上方"
 
         # 如果鳥掉出畫面下方
         if self.bird_y + self.bird_height > self.height:
             done = True
             reward = -100
+            death_reason = "掉出畫面下方"
 
         # 取得新的狀態
         state = self.get_state()
 
-        return state, reward, done
+        return state, reward, done, death_reason
